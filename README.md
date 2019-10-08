@@ -8,6 +8,8 @@ Our specification document can be viewed [here](https://github.com/PredatorFeesh
 
 This service links customers with different food options from local restaurants with different choices. Also acts as a mini-restaurant management system allowing managers, salespeople, delivery members, customers and cooks to interact. More information of the specifications below.
 
+### Given Specification
+
 The 5 user types:
 
 - [ ] Managers/Superusers :
@@ -100,3 +102,16 @@ OUR CHOSEN EXTRA FEATURE:
 1) Provide consistent GUI, different users will have different/personalized outlooks.
 2) Choose 1 creative feature for this sytem (10% of the score). Creativity Rewarded.
 3) Any system details not provided left for us to choose.
+
+
+## Current Plan (Subject to change)
+
+Technologies:
+- Python3 Flask (Gunicorn for more than 1 user support)
+- Amazon Buckets 
+- SQLite or MySql
+- More to be added
+
+Schema: To be added. Aim: Minimum (Hopefully 0) deletions. Tables done to support such.
+
+*Possible Addition*: Suppliers, Supplier_Item are another type in our system, which communicate with sales people. "Communicate" meaning placing orders.
