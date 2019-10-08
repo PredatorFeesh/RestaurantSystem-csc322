@@ -2,7 +2,7 @@
 
 ## Fall, 2019, CSc 32200, Professor Jie Wei
 
-Our specification document is titled prof_req_f19.pdf, view it to learn more about exactly we are supposed to create.
+Our specification document is titled [prof_req_f19.pdf](https://github.com/PredatorFeesh/RestaurantSystem-csc322/blob/master/proj_req_f19.pdf), view it to learn more about exactly we are supposed to create.
 
 ### Quick Overview
 
