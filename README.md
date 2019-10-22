@@ -126,8 +126,10 @@ TODO. Not needed at the moment.
 
 ### Database
 First, make sure you are running a mysql server on your laptop. Then, make sure you configure a user called `test` with password `password` and create a database `restaurantsystem`.
-* Might later change to SQLLite instead of MYSQL, unless we migrate to a server *
-Now, you need to create all the tables we are using. To do this, run `python3 `create_db.py`
+
+* Might later change to SQLLite instead of MYSQL, unless we migrate to a server
+
+Now, you need to create all the tables we are using. To do this, run `python3 create_db.py`
 
 ### Running
 Now, you can run the server. To run the server, type `python3 run.py`. 
