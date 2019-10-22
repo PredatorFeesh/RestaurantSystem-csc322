@@ -1,0 +1,5 @@
+mysqlclient
+flask
+flask-session
+flask-sqlalchemy
+flask-wtf
