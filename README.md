@@ -108,8 +108,8 @@ OUR CHOSEN EXTRA FEATURE:
 
 Technologies:
 - Python3 Flask (Gunicorn for more than 1 user support)
-- Amazon Buckets 
-- SQLite or MySql
+- Amazon Buckets (if time permits for images)
+- SQLAlchema (Database manager for MySQL DB)
 - More to be added
 
 Schema: To be added. Aim: Minimum (Hopefully 0) deletions. Tables done to support such.
