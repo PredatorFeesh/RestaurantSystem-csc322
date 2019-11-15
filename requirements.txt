@@ -3,4 +3,4 @@ flask
 flask-session
 flask-sqlalchemy
 flask-wtf
-fask-login
+flask-login
