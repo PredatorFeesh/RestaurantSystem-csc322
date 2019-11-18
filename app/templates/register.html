@@ -8,15 +8,23 @@
         {% for error in form.username.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
-        
-            Password: {{form.password}} <br>
+
+        Email: {{form.email}}
+        {% for error in form.email.error%}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+
+        Password: {{form.password}} <br>
         {% for error in form.password.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
 
-        {{form.remember_me}}
+            Confirm Password: {{form.password2}}
+        {% for error in form.password2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
     </p>
     
-    <p> {{ form.submit() }} </p>
+    <p> <input type="submit" value="Sign in"></input> </p>
 </form>
 {% endblock content %}
