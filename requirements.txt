@@ -4,3 +4,4 @@ flask-session
 flask-sqlalchemy
 flask-wtf
 flask-login
+flask-blueprint
