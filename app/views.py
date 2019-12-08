@@ -52,8 +52,9 @@ def logout():
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return "Welcome {}".format(current_user.user_type)
+        # return "Welcome {}".format(current_user.user_type)
         # return redirect(url_for("restaurants"))
+        pass
     return render_template("index.html")
 
 @app.route('/restaurants')
@@ -71,11 +72,13 @@ def restaurant(id):
 @app.route('/order', methods=["POST"])
 def order():
     # We go over the ids to get amount
+    rest_id = int(request.form["rest_id"])
     if current_user.is_authenticated:
-        if current_user.user_type != 1: # Only cust can see
+        if current_user.user_type != "1": # Only cust can see
             return "Sorry! Only customers can do that! Please return to <a href='/'>here</a>"
         cur_usr = Customer.query.get(int(str(current_user.get_id())[:-1] ))
-    menu_items = Restaurant.query.get(int(request.form["rest_id"])).menu_items.all()
+    restaurant = Restaurant.query.get(rest_id)
+    menu_items = restaurant.menu_items.all()
     #pretend correctly validated
     order = Order()
     db.session.add(order)
@@ -96,27 +99,33 @@ def order():
 
     if current_user.is_authenticated:
         cur_usr.orders.append(order)
-
+    
+    restaurant.orders.append(order)
+    
     db.session.commit()
 
-    return "Successfully placed order! Waiting for approval. View <a href='/my_orders'>here</a>"
+    return """Successfully placed order! Waiting for approval. View <a href='/my_orders'>here</a>
+                or if not logged in don't worry! Order is on its way! """
 
 @app.route('/my_orders')
 @login_required
 def my_orders():
     if current_user.is_authenticated:
-        if current_user.user_type != 1: # Only cust can see
+        if current_user.user_type != "1": # Only cust can see
             return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
     cur_usr = Customer.query.get(  int(  str(current_user.get_id())[:-1]  )  )
     orders = cur_usr.orders
     return render_template("my_orders.html", orders=orders)
 
+# Manager Stuff
 @app.route('/make_restaurant', methods=["GET","POST"])
 @login_required
 def make_restaurant():
     if current_user.user_type != "2":
         return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
     if request.method=="POST":
+        if current_user.restaurant != None: # if already got one can't make another
+            return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
         restaurant = Restaurant(name=request.form['name'], description=request.form['description'])
         restaurant.manager.append(current_user)
         db.session.add(restaurant)
@@ -130,9 +139,20 @@ def make_restaurant():
 def manage_orders():
     if current_user.user_type != "2":
         return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
-    
-    unapproved = current_user.restaurant.orders.filter(Order.approved==False).all()
-    print(unapproved)
+    if request.method=="POST":
+        order_id = request.form['order_id']
+        choice = request.form['choice']
+        if choice == "Approve":
+            Order.query.get(int(order_id)).approved = True
+        elif choice == "Deny":
+            print(Order.query.get(int(order_id)))
+            Order.query.get(int(order_id)).rejected = True
+        db.session.commit()
+        print("Done")
+        return redirect(url_for('manage_orders'))
+
+    unapproved = current_user.restaurant.orders.filter(Order.approved==False).filter(Order.rejected==False).all()
+    print("Unapproved orders: "+str(unapproved))
 
     return render_template("manage_orders.html", unapproved = unapproved)
 
@@ -150,8 +170,27 @@ def view_cooks():
             current_user.restaurant.cooks.append( Cook.query.get(int( request.form['hire'] )) )
         db.session.commit()
         return redirect(url_for('view_cooks'))
-    cooks = Cook.query.all()
+
+    cooks = Cook.query.filter(Cook.restaurant==None or Cook.restaurant==current_user.restaurant.id).all() # Only those not hired or yours
     return render_template("view_cooks.html", cooks=cooks)
+
+
+
+# Cook stuff
+@app.route('/make_menu', methods=["GET","POST"])
+@login_required
+def make_menu():
+    if current_user.user_type != "3":
+        return "Not authorized! <a href='/'>Go here</a>"
+    if request.method=="POST":
+        menu_item = Menu_Item(name=request.form['name'], description=request.form['description'], price=request.form['price'])
+        current_user.restaurant.menu_items.append(menu_item)
+        db.session.add(menu_item)
+        db.session.commit()
+        return "Success! View at <a href='restaurant/"+str(current_user.restaurant.id)+"'>menu page here.</a>"
+    return render_template("make_menu.html")
+
+
 
 
 # Customer

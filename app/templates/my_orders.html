@@ -1,6 +1,7 @@
 {%for order in orders%}
 <p>Approved? {{order.approved}}</p>
 <p>Delivered? {{order.delivered}}</p>
+<p>Rejected? {{order.rejected}}</p>
 <br />
 Items: 
 {% for item in order.ordered_items %}

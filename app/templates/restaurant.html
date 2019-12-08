@@ -1,3 +1,7 @@
+{% if current_user.user_type == "3" %}
+<a href="/make_menu"><button>Add Item</button></a> 
+{% endif %}
+
 <form action="{{url_for('order')}}" method="POST">
     {% for item in menu_items %}
         <p>{{item.name}}</p>

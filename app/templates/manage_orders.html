@@ -1,0 +1,11 @@
+{% for order in unapproved %}
+    <h5>Order by {{order.ordered.first().username}}:</h5>
+    <p>{{order.get_item().get_menu_item().name}} : {{order.amount}} at the price of ${{order.get_item().get_menu_item().price}} each</p>
+    <form method="POST" action="manage_orders">
+        <input type="hidden" name="order_id" value="{{order.id}}">
+        <input type="radio" name="choice" value="Approve"> Approve
+        <input type="radio" name="choice" value="Deny"> Deny
+        <input type="submit" value="Make Choice">
+    </form>
+    <hr />
+{% endfor %}

@@ -62,6 +62,9 @@ class Order(db.Model):
     )
     approved = db.Column(db.Boolean,default=False)
     delivered = db.Column(db.Boolean,default=False)
+    rejected = db.Column(db.Boolean,default=False)
+    def get_item(self):
+        return self.ordered_items.filter(Order_Item.order_id==self.id).first()
 
 class Restaurant(db.Model):
     """
@@ -84,9 +87,9 @@ class Restaurant(db.Model):
         backref=db.backref('order_restaurant_association', lazy='dynamic'),lazy = 'dynamic'
     )
 
-    manager = db.relationship("Manager", backref="restaurant")
+    manager = db.relationship("Manager", backref="restaurant", cascade="all, delete-orphan")
 
-    cooks = db.relationship("Cook", backref="restaurant", lazy='dynamic')
+    cooks = db.relationship("Cook", backref="restaurant", lazy='dynamic', cascade="all, delete-orphan")
 
 
 class Customer(db.Model, flask_login.UserMixin ):

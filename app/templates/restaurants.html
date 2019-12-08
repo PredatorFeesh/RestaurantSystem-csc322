@@ -4,8 +4,12 @@
     {% else %}
         <a href="/manage_orders"><button>Manage Restaurant</button></a>
     {% endif %}
-
 {% endif %}
+
+{% if current_user.user_type == "3" %}
+    <a href="/restaurant/{{current_user.restaurant.id}}"><button>View menu</button></a>
+{% endif %}
+
 
 {% for item in restaurants %}
 <a href="{{url_for('restaurant',id=item.id)}}"><p>{{item.name}}</p></a>
