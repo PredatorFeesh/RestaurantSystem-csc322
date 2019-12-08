@@ -111,14 +111,39 @@ def my_orders():
     orders = cur_usr.orders
     return render_template("my_orders.html", orders=orders)
 
+@app.route('/make_restaurant', methods=["GET","POST"])
+@login_required
+def make_restaurant():
+    if current_user.user_type != "2":
+        return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
+    if request.method=="POST":
+        restaurant = Restaurant(name=request.form['name'], description=request.form['description'])
+        restaurant.manager.append(current_user)
+        db.session.add(restaurant)
+        db.session.commit()
+        return "Success! Click <a href='/manage_orders'>here</a> to view."
+
+    return render_template("make_restaurant.html")
+
 @app.route('/manage_orders', methods=["GET","POST"])
 @login_required
 def manage_orders():
-    if current_user.user_type != 2:
+    if current_user.user_type != "2":
         return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
     
-    unapproved = Order.get_unapproved()
+    unapproved = current_user.restaurant.orders.filter(Order.approved==False).all()
+    print(unapproved)
+
     return render_template("manage_orders.html", unapproved = unapproved)
+
+@app.route('/see_cooks')
+@login_required
+def manage_orders():
+    if current_user.user_type != "2":
+        return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
+    cooks = Cook.query.all()
+    
+
 
 # Customer
 @app.route('/rc', methods=['GET', 'POST'])

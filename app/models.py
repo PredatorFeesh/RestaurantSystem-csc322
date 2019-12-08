@@ -86,6 +86,8 @@ class Restaurant(db.Model):
 
     manager = db.relationship("Manager", backref="restaurant")
 
+    cook = db.relationship("Cook", backref="restaurant")
+
 
 class Customer(db.Model, flask_login.UserMixin ):
     """
@@ -226,6 +228,8 @@ class Cook(db.Model, flask_login.UserMixin ):
     email = db.Column(db.String(100), index=True, unique=True)
     password_hash = db.Column(db.String(255))
     user_type = "3"
+
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
 
 
     authenticated = db.Column(db.Boolean, default=False)

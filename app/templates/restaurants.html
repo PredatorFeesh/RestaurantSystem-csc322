@@ -1,9 +1,8 @@
 {% if current_user.user_type == "2" %}
-
     {% if current_user.restaurant == None %}
-        <a href=""><button>Make Restaurant</button></a>
+        <a href="/make_restaurant"><button>Make Restaurant</button></a>
     {% else %}
-        <a href=""><button>Manage Restaurant</button></a>
+        <a href="/manage_orders"><button>Manage Restaurant</button></a>
     {% endif %}
 
 {% endif %}
