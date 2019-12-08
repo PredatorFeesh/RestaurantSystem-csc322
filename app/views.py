@@ -136,13 +136,13 @@ def manage_orders():
 
     return render_template("manage_orders.html", unapproved = unapproved)
 
-@app.route('/see_cooks')
+@app.route('/view_cooks')
 @login_required
-def manage_orders():
+def view_cooks():
     if current_user.user_type != "2":
         return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
     cooks = Cook.query.all()
-    
+    return render_template("view_cooks.html", cooks=cooks)
 
 
 # Customer
