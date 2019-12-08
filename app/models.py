@@ -10,6 +10,69 @@ sales 4
 deliverer 5
 """
 
+class CustRestType(db.Model):
+    __tablename__ = "custresttype"
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    cust_id = db.Column(db.Integer)
+    rest_id = db.Column(db.Integer)
+
+    # Could be: regular, registered, blacklisted
+    relation_tye = db.Column(db.String(255))
+
+
+
+class Restaurant(db.Model):
+    """
+    The main user model for our software. This should include the user type and all
+    its attributes.
+    
+    """
+    __tablename__ = 'restaurant'
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column( db.String(100) )
+    description = db.Column( db.String(100) )
+
+    menu_items = db.relationship('Menu_Item', backref=db.backref('restaurant'), lazy='dynamic' )
+
+class Menu_Item(db.Model):
+    __tablename__ = 'menu_item'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column( db.String(100) )
+    description = db.Column( db.String(255) )
+    price = db.Column( db.String(255) )
+
+    restaurant_id = db.Column( db.Integer, db.ForeignKey('restaurant.id') )
+
+order_menu_association = db.Table( 'order_menu_association', db.Model.metadata,
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id') ),
+    db.Column('item_id', db.Integer, db.ForeignKey('order_item.id') )
+)
+ordered = db.Table('orders', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('customer.id')),
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id'))
+)
+
+class Order_Item(db.Model):
+    __tablename__ = 'order_item'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    menu_item_id = db.Column(db.Integer)
+    order_id = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    def get_menu_item(self):
+        return Menu_Item.query.filter(Menu_Item.id==self.id).first()
+
+class Order(db.Model):
+    __tablename__ = 'order'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    ordered_items = db.relationship(
+        'Order_Item', secondary=order_menu_association,
+        primaryjoin=(order_menu_association.c.order_id == id),
+        secondaryjoin=(order_menu_association.c.item_id == Order_Item.menu_item_id),
+        backref=db.backref('order_menu_association', lazy='dynamic'),lazy = 'dynamic'
+    )
+    approved = db.Column(db.Boolean,default=False)
+    delivered = db.Column(db.Boolean,default=False)
 
 class Customer(db.Model, flask_login.UserMixin ):
     """
@@ -25,6 +88,11 @@ class Customer(db.Model, flask_login.UserMixin ):
     password_hash = db.Column(db.String(255))
     user_type="1"
     
+    orders = db.relationship("Order", secondary=ordered,
+        primaryjoin=(ordered.c.user_id==id),
+        secondaryjoin=(ordered.c.order_id==Order.id),
+        backref=db.backref('ordered', lazy="dynamic"), lazy='dynamic'
+    )
 
 
     authenticated = db.Column(db.Boolean, default=False)
@@ -207,22 +275,4 @@ class Sales(db.Model, flask_login.UserMixin ):
     def is_anonymous(self):
         """False, as anonymous users aren't supported."""
         return False
-
-
-
-class Foods(db.Model):
-    __tablename__ = 'foods'
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-
-class Restaurant(db.Model):
-    """
-    The main user model for our software. This should include the user type and all
-    its attributes.
-    
-    """
-    __tablename__ = 'restaurant'
-
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    
-    name = db.Column(db.String(100), index=True)
 

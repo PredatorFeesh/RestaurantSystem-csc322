@@ -1,0 +1,11 @@
+<form action="{{url_for('order')}}" method="POST">
+    {% for item in menu_items %}
+        <p>{{item.name}}</p>
+        <p>{{item.description}}</p>
+        <p>{{item.price}}</p>
+        <input type="hidden" name="rest_id" value="{{rest_id}}" />
+        How much? <input type="text" name="{{item.id}}" value='0'/>
+        <hr />
+    {% endfor %}
+<input type="submit" value="Place order!" /> 
+</form>

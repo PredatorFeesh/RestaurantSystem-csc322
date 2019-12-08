@@ -4,8 +4,8 @@ from app.forms import LoginForm, RegisterForm
 import flask_login as fl
 from flask_login import current_user, login_user, logout_user, login_required
 
-from app.models import Customer, Manager, Cook, Sales, Deliverer # Actual users
-from app.models import db # Our database
+from app.models import * # Actual users
+from app import db # Our database
 
 from app import customer, manager, cook, sales, deliverer # Login
 
@@ -30,26 +30,18 @@ def load_user(id):
     elif type == "5":
         return Deliverer.query.get(int(id))
 
-    
 
-# @manager.user_loader
-# def m_login(id):
-#     return Manager.query.filter_by(id=id).first()
-
-# @cook.user_loader
-# def co_login(id):
-#     return Cook.query.filter_by(id=id).first()
-
-# @sales.user_loader
-# def s_login(id):
-#     return Sales.query.filter_by(id=id).first()
-
-# @deliverer.user_loader
-# def d_login(id):
-#     return Deliverer.query.filter_by(id=id).first()
-
-
-
+def get_login(user_type, user_id):
+    if type == "1":
+        return Customer.query.get(int(id))
+    elif type == "2":
+        return Manager.query.get(int(id))
+    elif type == "3":
+        return Cook.query.get(int(id))
+    elif type == "4":
+        return Sales.query.get(int(id))
+    elif type == "5":
+        return Deliverer.query.get(int(id))
 
 @app.route('/logout')
 def logout():
@@ -61,7 +53,64 @@ def logout():
 def index():
     if current_user.is_authenticated:
         return "Welcome {}".format(current_user.user_type)
-    return "Works! Plase log in! "
+        # return redirect(url_for("restaurants"))
+    return render_template("index.html")
+
+@app.route('/restaurants')
+def restaurants():
+    restaurants = Restaurant.query.paginate(1,20,False).items 
+    print(restaurants)
+    return render_template("restaurants.html", restaurants=restaurants)
+
+@app.route('/restaurant/<int:id>')
+def restaurant(id):
+    menu_items = Restaurant.query.get(id).menu_items.all()
+    print(menu_items)
+    return render_template("restaurant.html",rest_id=id,menu_items=menu_items)
+
+@app.route('/order', methods=["POST"])
+def order():
+    # We go over the ids to get amount
+    print(str(request.form["rest_id"]))
+    menu_items = Restaurant.query.get(int(request.form["rest_id"])).menu_items.all()
+    if current_user.is_authenticated:
+        print(current_user.get_id())
+        cur_usr = Customer.query.get(int(str(current_user.get_id())[:-1] ))
+    print(menu_items)
+    #pretend correctly validated
+    order = Order()
+    db.session.add(order)
+    db.session.commit()
+    print("Order_id = "+str(order.id))
+    
+    items = 0
+    
+    for item in menu_items:
+        amount = int(request.form[str(item.id)])
+        if amount != 0:
+            items += 1
+            req_item = Order_Item(menu_item_id=item.id, order_id=order.id ,amount=amount)
+            db.session.add(req_item)
+            order.ordered_items.append(req_item)
+    
+    if items == 0:
+        return "No orders!" 
+
+    if current_user.is_authenticated:
+        cur_usr.orders.append(order)
+
+    db.session.commit()
+
+    return "Successfully placed order! Waiting for approval."
+
+@app.route('/my_orders')
+@login_required
+def my_orders():
+    cur_usr = Customer.query.get(  int(  str(current_user.get_id())[:-1]  )  )
+    orders = cur_usr.orders
+    return render_template("my_orders.html", orders=orders)
+
+
 
 # Customer
 @app.route('/rc', methods=['GET', 'POST'])

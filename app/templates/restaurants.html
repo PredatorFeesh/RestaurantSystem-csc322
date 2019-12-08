@@ -1,0 +1,5 @@
+{% for item in restaurants %}
+<a href="{{url_for('restaurant',id=item.id)}}"><p>{{item.name}}</p></a>
+<p>{{item.description}}</p>
+<hr />
+{% endfor %}

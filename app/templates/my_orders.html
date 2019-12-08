@@ -1,0 +1,14 @@
+{%for order in orders%}
+<p>Approved? {{order.approved}}</p>
+<p>Delivered? {{order.delivered}}</p>
+<br />
+Items: 
+{% for item in order.ordered_items %}
+    <p>{{item.get_menu_item().name}} : {{item.amount}} at the price of ${{item.get_menu_item().price}} each</p>
+
+{%endfor%}
+
+Total spent: 
+
+<hr />
+{% endfor %}
