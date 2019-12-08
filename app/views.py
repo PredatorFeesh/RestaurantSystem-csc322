@@ -136,11 +136,20 @@ def manage_orders():
 
     return render_template("manage_orders.html", unapproved = unapproved)
 
-@app.route('/view_cooks')
+@app.route('/view_cooks', methods=["GET","POST"])
 @login_required
 def view_cooks():
     if current_user.user_type != "2":
         return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
+    if request.method=="POST":
+        try:
+            if request.form['fire'] is not None:
+                current_user.restaurant.cooks.remove(Cook.query.get(request.form['fire'] ))
+        except Exception:
+            print(request.form['hire'])
+            current_user.restaurant.cooks.append( Cook.query.get(int( request.form['hire'] )) )
+        db.session.commit()
+        return redirect(url_for('view_cooks'))
     cooks = Cook.query.all()
     return render_template("view_cooks.html", cooks=cooks)
 

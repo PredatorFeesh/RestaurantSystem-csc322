@@ -75,7 +75,7 @@ class Restaurant(db.Model):
     name = db.Column( db.String(100) )
     description = db.Column( db.String(100) )
 
-    menu_items = db.relationship('Menu_Item', backref=db.backref('restaurant'), lazy='dynamic' )
+    menu_items = db.relationship('Menu_Item', backref=db.backref('restaurant'), lazy='dynamic', cascade="all, delete-orphan" )
 
     orders = db.relationship(
         'Order', secondary=order_restaurant_association,
@@ -86,7 +86,7 @@ class Restaurant(db.Model):
 
     manager = db.relationship("Manager", backref="restaurant")
 
-    cook = db.relationship("Cook", backref="restaurant")
+    cooks = db.relationship("Cook", backref="restaurant", lazy='dynamic')
 
 
 class Customer(db.Model, flask_login.UserMixin ):

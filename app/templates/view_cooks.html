@@ -1,6 +1,12 @@
 {% for cook in cooks %}
     <p>{{cook.username}}</p>
     <form action="view_cooks" method="POST">
-        <input type="submit" name="{{cook.id}}" value="Hire cook {{cook.username}}" >
+        {% if cook.restaurant == current_user.restaurant %}
+            <input type="hidden" name="fire" value="{{cook.id}}" />
+            <input type="submit" name="{{cook.id}}" value="Fire cook {{cook.username}}" >
+        {% else %}
+            <input type="hidden" name="hire" value="{{cook.id}}" />
+            <input type="submit" name="{{cook.id}}" value="Hire cook {{cook.username}}" >
+        {% endif %}
     </form>
 {% endfor %}
