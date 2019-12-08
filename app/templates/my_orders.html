@@ -1,15 +1,20 @@
-{%for order in orders%}
-<p>Approved? {{order.approved}}</p>
-<p>Delivered? {{order.delivered}}</p>
-<p>Rejected? {{order.rejected}}</p>
-<br />
-Items: 
-{% for item in order.ordered_items %}
-    <p>{{item.get_menu_item().name}} : {{item.amount}} at the price of ${{item.get_menu_item().price}} each</p>
+{% extends 'base.html'%}
 
-{%endfor%}
-
-Total spent: 
-
-<hr />
-{% endfor %}
+{%block content%}
+<a href="/restaurants"><button class="btn btn-success" style="margin-bottom: 3px;">Back to Restaurant</button></a>
+<div class="container" style="margin-top: 3%">
+        <div class="card shadow-lg" style="margin-bottom: 3px;"></div>
+        {%for order in orders%}
+            <div class="card shadow-lg" style="margin-bottom: 3px;">
+            <p>Approved? {{order.approved}}</p>
+            <p>Delivered? {{order.delivered}}</p>
+            <p>Rejected? {{order.rejected}}</p>
+            <br />
+            Items: 
+            {% for item in order.ordered_items %}
+                <p>{{item.get_menu_item().name}} : {{item.amount}} at the price of ${{item.get_menu_item().price}} each</p>
+            {%endfor%}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,18 +1,50 @@
-{% if current_user.user_type == "2" %}
-    {% if current_user.restaurant == None %}
-        <a href="/make_restaurant"><button>Make Restaurant</button></a>
-    {% else %}
-        <a href="/manage_orders"><button>Manage Restaurant</button></a>
-    {% endif %}
-{% endif %}
+{%extends 'base.html'%}
 
-{% if current_user.user_type == "3" %}
-    <a href="/restaurant/{{current_user.restaurant.id}}"><button>View menu</button></a>
-{% endif %}
+{% block content %}
+    <div class="container" style="max-width: 60%;" >       
+        
+        {% if current_user.user_type == "1" %}
+        <a href="/my_orders"><button class="btn btn-success" style="margin-bottom: 3px;">View Orders</button></a>
+        {% endif %}
+        
+        {% if current_user.user_type == "2" %}
+            {% if current_user.restaurant == None %}
+                <a href="/make_restaurant"><button class="btn btn-success" style="margin-bottom: 3px;">Make Restaurant</button></a>
+            {% else %}
+                <a href="/manage_orders"><button class="btn btn-success" style="margin-bottom: 3px;">Manage Restaurant</button></a>
+                <a href="/view_cooks"><button class="btn btn-success" style="margin-bottom: 3px;">Manage Cooks</button></a>
+            {% endif %}
+        {% endif %}
+
+        {% if current_user.user_type == "3" %}
+            <a href="/restaurant/{{current_user.restaurant.id}}"><button class="btn btn-success" style="margin-bottom: 3px;">View menu</button></a>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+        <a href="/logout"><button class="btn btn-success" style="margin-bottom: 3px;">Logout</button></a>
+        {% endif %}
+        
+        {% for item in restaurants %}
+
+        <div class="card shadow-lg" style="margin-bottom: 3px;">
+            <div class="card-body" style="text-align: center;">
+                {% if current_user.user_type == "2" or current_user.user_type == "3" or current_user.user_type == "4"%}
+                    {% if current_user.restaurant.id==item.id %}
+                        <h2 style="color:red">Your Store</h2>
+                    {% endif %}
+                {% endif %}
+                <h3 class="card-title">
+                        <a href="{{url_for('restaurant',id=item.id)}}"><p>{{item.name}}</p></a>
+                </h3>
+                <p>
+                        <p>{{item.description}}</p>  
+                </p>
+                <a href="{{url_for('restaurant',id=item.id)}}" class="btn btn-primary">Menu</a>
+            </div>
+        </div> 
+        {% endfor %}
 
 
-{% for item in restaurants %}
-<a href="{{url_for('restaurant',id=item.id)}}"><p>{{item.name}}</p></a>
-<p>{{item.description}}</p>
-<hr />
-{% endfor %}
+    </div>
+
+{% endblock content %}

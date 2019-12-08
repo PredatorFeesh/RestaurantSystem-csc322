@@ -89,7 +89,7 @@ class Restaurant(db.Model):
 
     manager = db.relationship("Manager", backref="restaurant", cascade="all, delete-orphan")
 
-    cooks = db.relationship("Cook", backref="restaurant", lazy='dynamic', cascade="all, delete-orphan")
+    cooks = db.relationship("Cook", backref="restaurant", lazy='dynamic')
 
 
 class Customer(db.Model, flask_login.UserMixin ):

@@ -66,8 +66,9 @@ def restaurants():
 @app.route('/restaurant/<int:id>')
 def restaurant(id):
     menu_items = Restaurant.query.get(id).menu_items.all()
+    rest = Restaurant.query.get(id)
     print(menu_items)
-    return render_template("restaurant.html",rest_id=id,menu_items=menu_items)
+    return render_template("restaurant.html",rest_id=id, rest=rest ,menu_items=menu_items)
 
 @app.route('/order', methods=["POST"])
 def order():
@@ -171,8 +172,11 @@ def view_cooks():
         db.session.commit()
         return redirect(url_for('view_cooks'))
 
-    cooks = Cook.query.filter(Cook.restaurant==None or Cook.restaurant==current_user.restaurant.id).all() # Only those not hired or yours
-    return render_template("view_cooks.html", cooks=cooks)
+    cooks = Cook.query.filter(Cook.restaurant==None).all() # Only those not hired or yours
+    my_cooks = Cook.query.filter(Cook.restaurant==current_user.restaurant).all()
+    print("Cook rest: "+str(Cook.query.first().restaurant))
+    print(my_cooks)
+    return render_template("view_cooks.html", cooks=cooks, my_cooks = my_cooks)
 
 
 
