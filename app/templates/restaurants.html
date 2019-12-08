@@ -1,3 +1,13 @@
+{% if current_user.user_type == "2" %}
+
+    {% if current_user.restaurant == None %}
+        <a href=""><button>Make Restaurant</button></a>
+    {% else %}
+        <a href=""><button>Manage Restaurant</button></a>
+    {% endif %}
+
+{% endif %}
+
 {% for item in restaurants %}
 <a href="{{url_for('restaurant',id=item.id)}}"><p>{{item.name}}</p></a>
 <p>{{item.description}}</p>

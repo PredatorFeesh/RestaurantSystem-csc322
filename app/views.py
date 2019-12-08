@@ -71,17 +71,15 @@ def restaurant(id):
 @app.route('/order', methods=["POST"])
 def order():
     # We go over the ids to get amount
-    print(str(request.form["rest_id"]))
-    menu_items = Restaurant.query.get(int(request.form["rest_id"])).menu_items.all()
     if current_user.is_authenticated:
-        print(current_user.get_id())
+        if current_user.user_type != 1: # Only cust can see
+            return "Sorry! Only customers can do that! Please return to <a href='/'>here</a>"
         cur_usr = Customer.query.get(int(str(current_user.get_id())[:-1] ))
-    print(menu_items)
+    menu_items = Restaurant.query.get(int(request.form["rest_id"])).menu_items.all()
     #pretend correctly validated
     order = Order()
     db.session.add(order)
     db.session.commit()
-    print("Order_id = "+str(order.id))
     
     items = 0
     
@@ -101,16 +99,26 @@ def order():
 
     db.session.commit()
 
-    return "Successfully placed order! Waiting for approval."
+    return "Successfully placed order! Waiting for approval. View <a href='/my_orders'>here</a>"
 
 @app.route('/my_orders')
 @login_required
 def my_orders():
+    if current_user.is_authenticated:
+        if current_user.user_type != 1: # Only cust can see
+            return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
     cur_usr = Customer.query.get(  int(  str(current_user.get_id())[:-1]  )  )
     orders = cur_usr.orders
     return render_template("my_orders.html", orders=orders)
 
-
+@app.route('/manage_orders', methods=["GET","POST"])
+@login_required
+def manage_orders():
+    if current_user.user_type != 2:
+        return "Sorry! You can't do that! Please return to <a href='/'>here</a>"
+    
+    unapproved = Order.get_unapproved()
+    return render_template("manage_orders.html", unapproved = unapproved)
 
 # Customer
 @app.route('/rc', methods=['GET', 'POST'])

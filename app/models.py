@@ -19,21 +19,18 @@ class CustRestType(db.Model):
     # Could be: regular, registered, blacklisted
     relation_tye = db.Column(db.String(255))
 
-
-
-class Restaurant(db.Model):
-    """
-    The main user model for our software. This should include the user type and all
-    its attributes.
-    
-    """
-    __tablename__ = 'restaurant'
-
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column( db.String(100) )
-    description = db.Column( db.String(100) )
-
-    menu_items = db.relationship('Menu_Item', backref=db.backref('restaurant'), lazy='dynamic' )
+order_restaurant_association = db.Table( 'order_restaurant_association', db.Model.metadata,
+    db.Column('restaurant_id', db.Integer, db.ForeignKey('restaurant.id') ),
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id') )
+)
+order_menu_association = db.Table( 'order_menu_association', db.Model.metadata,
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id') ),
+    db.Column('item_id', db.Integer, db.ForeignKey('order_item.id') )
+)
+ordered = db.Table('orders', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('customer.id')),
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id'))
+)
 
 class Menu_Item(db.Model):
     __tablename__ = 'menu_item'
@@ -44,14 +41,6 @@ class Menu_Item(db.Model):
 
     restaurant_id = db.Column( db.Integer, db.ForeignKey('restaurant.id') )
 
-order_menu_association = db.Table( 'order_menu_association', db.Model.metadata,
-    db.Column('order_id', db.Integer, db.ForeignKey('order.id') ),
-    db.Column('item_id', db.Integer, db.ForeignKey('order_item.id') )
-)
-ordered = db.Table('orders', db.Model.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('customer.id')),
-    db.Column('order_id', db.Integer, db.ForeignKey('order.id'))
-)
 
 class Order_Item(db.Model):
     __tablename__ = 'order_item'
@@ -73,6 +62,30 @@ class Order(db.Model):
     )
     approved = db.Column(db.Boolean,default=False)
     delivered = db.Column(db.Boolean,default=False)
+
+class Restaurant(db.Model):
+    """
+    The main user model for our software. This should include the user type and all
+    its attributes.
+    
+    """
+    __tablename__ = 'restaurant'
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column( db.String(100) )
+    description = db.Column( db.String(100) )
+
+    menu_items = db.relationship('Menu_Item', backref=db.backref('restaurant'), lazy='dynamic' )
+
+    orders = db.relationship(
+        'Order', secondary=order_restaurant_association,
+        primaryjoin=(order_restaurant_association.c.restaurant_id == id),
+        secondaryjoin=(order_restaurant_association.c.order_id == Order.id),
+        backref=db.backref('order_restaurant_association', lazy='dynamic'),lazy = 'dynamic'
+    )
+
+    manager = db.relationship("Manager", backref="restaurant")
+
 
 class Customer(db.Model, flask_login.UserMixin ):
     """
@@ -133,6 +146,8 @@ class Manager(db.Model, flask_login.UserMixin ):
     email = db.Column(db.String(100), index=True, unique=True)
     password_hash = db.Column(db.String(255))
     user_type="2"
+
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
 
 
     authenticated = db.Column(db.Boolean, default=False)
