@@ -53,8 +53,7 @@ def logout():
 def index():
     if current_user.is_authenticated:
         # return "Welcome {}".format(current_user.user_type)
-        # return redirect(url_for("restaurants"))
-        pass
+        return redirect(url_for("restaurants"))
     return render_template("index.html")
 
 @app.route('/restaurants')

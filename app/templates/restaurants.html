@@ -13,6 +13,10 @@
             {% else %}
                 <a href="/manage_orders"><button class="btn btn-success" style="margin-bottom: 3px;">Manage Restaurant</button></a>
                 <a href="/view_cooks"><button class="btn btn-success" style="margin-bottom: 3px;">Manage Cooks</button></a>
+                
+                {% if current_user.restaurant.cooks.all()|length <= 2 %}
+                    <h1 class="warning"> Need {{2 - current_user.restaurant.cooks.all() | length}} more chef(s)! </h1>
+                {% endif %}
             {% endif %}
         {% endif %}
 
